@@ -1,11 +1,11 @@
-import type { FastifyInstance } from 'fastify'
-import { scheduleController } from '../controllers/schedule.controller'
-import { dayConfigController } from '../controllers/day-config.controller'
-import { requireAdmin } from '../middlewares/auth.middleware'
+import type { FastifyInstance } from 'fastify';
+import { dayConfigController } from '../controllers/day-config.controller';
+import { scheduleController } from '../controllers/schedule.controller';
+import { requireAdmin } from '../middlewares/auth.middleware';
 
 export async function adminRoutes(app: FastifyInstance) {
   // All routes in this plugin require admin auth
-  app.addHook('preHandler', requireAdmin)
+  app.addHook('preHandler', requireAdmin);
 
   // ── Schedules ────────────────────────────────────────────────────────────────
 
@@ -27,7 +27,7 @@ export async function adminRoutes(app: FastifyInstance) {
       },
     },
     handler: scheduleController.createSchedule.bind(scheduleController),
-  })
+  });
 
   app.post('/schedules/bulk', {
     schema: {
@@ -36,7 +36,21 @@ export async function adminRoutes(app: FastifyInstance) {
       security: [{ bearerAuth: [] }],
     },
     handler: scheduleController.bulkCreateSchedule.bind(scheduleController),
-  })
+  });
+
+  app.patch('/schedules/:id/book', {
+    schema: {
+      tags: ['Admin - Horários'],
+      summary: 'Marcar um horário como agendado',
+      security: [{ bearerAuth: [] }],
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: { id: { type: 'string' } },
+      },
+    },
+    handler: scheduleController.bookSchedule.bind(scheduleController),
+  });
 
   app.patch('/schedules/:id', {
     schema: {
@@ -50,7 +64,7 @@ export async function adminRoutes(app: FastifyInstance) {
       },
     },
     handler: scheduleController.updateSchedule.bind(scheduleController),
-  })
+  });
 
   app.delete('/schedules/:id', {
     schema: {
@@ -64,7 +78,7 @@ export async function adminRoutes(app: FastifyInstance) {
       },
     },
     handler: scheduleController.deleteSchedule.bind(scheduleController),
-  })
+  });
 
   // ── Day Config ───────────────────────────────────────────────────────────────
 
@@ -84,7 +98,7 @@ export async function adminRoutes(app: FastifyInstance) {
       },
     },
     handler: dayConfigController.setDayStatus.bind(dayConfigController),
-  })
+  });
 
   app.get('/day-config/closed', {
     schema: {
@@ -93,7 +107,7 @@ export async function adminRoutes(app: FastifyInstance) {
       security: [{ bearerAuth: [] }],
     },
     handler: dayConfigController.listClosedDays.bind(dayConfigController),
-  })
+  });
 
   app.get('/day-config/:date', {
     schema: {
@@ -107,5 +121,5 @@ export async function adminRoutes(app: FastifyInstance) {
       },
     },
     handler: dayConfigController.getDayStatus.bind(dayConfigController),
-  })
+  });
 }

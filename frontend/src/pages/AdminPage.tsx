@@ -1,35 +1,35 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { AdminHeader } from '@/components/AdminHeader'
-import { WeekNavigator } from '@/components/WeekNavigator'
-import { WeekGrid } from '@/components/WeekGrid'
-import { GenerateSlotsModal } from '@/components/GenerateSlotsModal'
-import { useWeekSchedule } from '@/hooks/useWeekSchedule'
-import { useAdminSchedule } from '@/hooks/useAdminSchedule'
-import { useAuth } from '@/hooks/useAuth'
-import { type SlotStatus } from '@/services/api'
-import { Scissors, AlertCircle } from 'lucide-react'
+import { AdminHeader } from '@/components/AdminHeader';
+import { GenerateSlotsModal } from '@/components/GenerateSlotsModal';
+import { WeekGrid } from '@/components/WeekGrid';
+import { WeekNavigator } from '@/components/WeekNavigator';
+import { useAdminSchedule } from '@/hooks/useAdminSchedule';
+import { useAuth } from '@/hooks/useAuth';
+import { useWeekSchedule } from '@/hooks/useWeekSchedule';
+import { type SlotStatus } from '@/services/api';
+import { AlertCircle, Scissors } from 'lucide-react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export function AdminPage() {
-  const navigate = useNavigate()
-  const { logout } = useAuth()
-  const [generateDate, setGenerateDate] = useState<string | null>(null)
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const [generateDate, setGenerateDate] = useState<string | null>(null);
 
   const { data, loading, error, startDate, weekOffset, prevWeek, nextWeek, goToday, refresh } =
-    useWeekSchedule()
+    useWeekSchedule();
 
-  const { loading: actionLoading, updateSlot, deleteSlot, bulkCreate, setDayStatus } =
-    useAdminSchedule(refresh)
+  const { loading: actionLoading, updateSlot, bookSlot, deleteSlot, bulkCreate, setDayStatus } =
+    useAdminSchedule(refresh);
 
   const handleLogout = () => {
-    logout()
-    navigate('/login-admin')
-  }
+    logout();
+    navigate('/login-admin');
+  };
 
-  const handleStatusChange = (id: string, status: SlotStatus) => updateSlot(id, status)
-  const handleDelete = (id: string) => deleteSlot(id)
-  const handleToggleDay = (date: string, isClosed: boolean) => setDayStatus(date, isClosed)
-  const handleGenerateSlots = (date: string) => setGenerateDate(date)
+  const handleStatusChange = (id: string, status: SlotStatus) => updateSlot(id, status);
+  const handleDelete = (id: string) => deleteSlot(id);
+  const handleToggleDay = (date: string, isClosed: boolean) => setDayStatus(date, isClosed);
+  const handleGenerateSlots = (date: string) => setGenerateDate(date);
 
   return (
     <div className="min-h-screen flex flex-col bg-cream">
@@ -79,6 +79,7 @@ export function AdminPage() {
               onDelete={handleDelete}
               onToggleDay={handleToggleDay}
               onGenerateSlots={handleGenerateSlots}
+              onBookSlot={bookSlot}
             />
           </div>
         )}
@@ -98,5 +99,5 @@ export function AdminPage() {
         </p>
       </footer>
     </div>
-  )
+  );
 }

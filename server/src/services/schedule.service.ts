@@ -124,6 +124,28 @@ export class ScheduleService {
     return { created: results, errors };
   }
 
+  async bookSchedule(id: string) {
+    const schedule = await prisma.schedule.findUnique({ where: { id } });
+
+    if (!schedule) {
+      throw new Error('Horário não encontrado');
+    }
+
+    if (isLunchTime(schedule.startTime, schedule.endTime)) {
+      throw new Error('Horários do almoço não podem ser agendados');
+    }
+
+    if (schedule.status === 'BOOKED') {
+      throw new Error('Este horário já está agendado');
+    }
+
+    if (schedule.status === 'CLOSED') {
+      throw new Error('Este horário está fechado e não pode ser agendado');
+    }
+
+    return prisma.schedule.update({ where: { id }, data: { status: 'BOOKED' } });
+  }
+
   async updateSchedule(id: string, data: UpdateScheduleDto) {
     const schedule = await prisma.schedule.findUnique({ where: { id } });
 

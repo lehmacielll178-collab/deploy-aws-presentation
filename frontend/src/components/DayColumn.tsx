@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { type DaySchedule, type SlotStatus } from '@/services/api';
-import { CalendarX, Coffee, MessageCircle, PlusCircle } from 'lucide-react';
+import { CalendarCheck, CalendarX, Coffee, MessageCircle, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 
 const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -26,11 +26,12 @@ interface DayColumnProps {
   onDelete?: (id: string) => void;
   onToggleDay?: (date: string, isClosed: boolean) => void;
   onGenerateSlots?: (date: string) => void;
+  onBookSlot?: (slotId: string) => Promise<void>;
 }
 
 export function DayColumn({
   day, isAdmin, isToday,
-  onStatusChange, onDelete, onToggleDay, onGenerateSlots,
+  onStatusChange, onDelete, onToggleDay, onGenerateSlots, onBookSlot,
 }: DayColumnProps) {
   const [bookingOpen, setBookingOpen] = useState(false);
 
@@ -190,12 +191,22 @@ export function DayColumn({
                       onDelete={onDelete}
                     />
                   ))}
-                  <Button variant="ghost" size="sm"
-                    className="mt-1 text-xs text-ink-400 hover:text-ink w-full"
-                    onClick={() => onGenerateSlots?.(day.date)}>
-                    <PlusCircle className="w-3 h-3" />
-                    Adicionar slots
-                  </Button>
+                  <div className="flex gap-1 mt-1">
+                    {hasAvailable && (
+                      <Button variant="gold" size="sm"
+                        className="flex-1 text-xs gap-1 h-7"
+                        onClick={() => setBookingOpen(true)}>
+                        <CalendarCheck className="w-3 h-3" />
+                        Agendar
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="sm"
+                      className="flex-1 text-xs text-ink-400 hover:text-ink h-7"
+                      onClick={() => onGenerateSlots?.(day.date)}>
+                      <PlusCircle className="w-3 h-3" />
+                      Slots
+                    </Button>
+                  </div>
                 </>
               )}
             </>
@@ -214,14 +225,13 @@ export function DayColumn({
         )}
       </div>
 
-      {/* Booking modal — only for public view */}
-      {!isAdmin && (
-        <BookingModal
-          date={bookingOpen ? day.date : null}
-          slots={day.slots}
-          onClose={() => setBookingOpen(false)}
-        />
-      )}
+      {/* Booking modal — public and admin */}
+      <BookingModal
+        date={bookingOpen ? day.date : null}
+        slots={day.slots}
+        onClose={() => setBookingOpen(false)}
+        onBook={isAdmin ? onBookSlot : undefined}
+      />
     </>
   );
 }
