@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum SCHEDULE_STATUS {
+  AVAILABLE
+  BOOKED
+  CLOSED
+}
+
+enum USER_ROLE {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  role      USER_ROLE @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
+}
+
+model Schedule {
+  id        String          @id @default(uuid())
+  date      String // Format: YYYY-MM-DD
+  startTime String // Format: HH:MM
+  endTime   String // Format: HH:MM
+  status    SCHEDULE_STATUS @default(AVAILABLE)
+  label     String? // Optional label, e.g., "Lunch break", "Holiday"
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@unique([date, startTime])
+  @@map("schedules")
+}
+
+model DayConfig {
+  id        String   @id @default(uuid())
+  date      String   @unique // Format: YYYY-MM-DD
+  isClosed  Boolean  @default(false)
+  reason    String? // Reason for closing the day
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("day_configs")
+}
