@@ -40,6 +40,8 @@ export async function buildApp() {
     secret: env.JWT_SECRET,
   });
 
+  console.log(corsUrls(env.FRONTEND_URL));
+
   app.register(cors, {
     origin: [
       ...corsUrls(env.FRONTEND_URL),

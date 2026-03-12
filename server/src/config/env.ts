@@ -9,7 +9,7 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().email().default('admin@barbearia.com'),
   ADMIN_PASSWORD: z.string().min(6).default('admin123'),
   ADMIN_NAME: z.string().default('Administrador'),
-  FRONTEND_URL: z.url().default('http://localhost:5173'),
+  FRONTEND_URL: z.url(),
 });
 
 const _env = envSchema.safeParse(process.env);
