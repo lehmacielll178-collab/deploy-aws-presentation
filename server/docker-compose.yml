@@ -6,7 +6,7 @@ services:
     container_name: barber-server
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "80:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=file:/app/data/database.sqlite
