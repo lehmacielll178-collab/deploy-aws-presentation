@@ -1,6 +1,6 @@
-import type { FastifyInstance } from 'fastify'
-import { authController } from '../controllers/auth.controller'
-import { authenticate } from '../middlewares/auth.middleware'
+import type { FastifyInstance } from 'fastify';
+import { authController } from '../controllers/auth.controller';
+import { authenticate } from '../middlewares/auth.middleware';
 
 export async function authRoutes(app: FastifyInstance) {
   app.post('/login', {
@@ -17,15 +17,7 @@ export async function authRoutes(app: FastifyInstance) {
       },
     },
     handler: authController.login.bind(authController),
-  })
+  });
 
-  app.get('/me', {
-    schema: {
-      tags: ['Auth'],
-      summary: 'Dados do usuário autenticado',
-      security: [{ bearerAuth: [] }],
-    },
-    preHandler: [authenticate],
-    handler: authController.me.bind(authController),
-  })
+  app.get('/me', { preHandler: [authenticate] }, authController.me.bind(authController));
 }
