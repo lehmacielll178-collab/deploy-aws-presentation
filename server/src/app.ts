@@ -56,7 +56,7 @@ export async function buildApp() {
   });
 
   // ── Health check ─────────────────────────────────────────────────────────────
-  app.get('/health', { schema: { tags: ['System'] } }, async (_req, reply) => {
+  app.get('/health', async (_req, reply) => {
     return reply.status(200).send({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
