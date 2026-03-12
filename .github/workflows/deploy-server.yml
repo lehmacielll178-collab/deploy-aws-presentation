@@ -13,10 +13,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: server
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,7 +30,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{  secrets.EC2_SSH_KEY }}
-          source: ".,!.git*"
+          source: "./server,!.git*"
           target: "~/app/server"
           overwrite: true
 
