@@ -19,6 +19,7 @@ jobs:
 
       - name: Build ENV
         run: |
+          cd server
           echo "JWT_SECRET=$(openssl rand -base64 16)" >> .env
           echo "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" >> .env
           echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> .env
