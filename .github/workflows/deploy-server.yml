@@ -1,0 +1,53 @@
+name: Deploy Server
+
+on:
+  push:
+    branches:
+      - prod
+    paths:
+      - "server/**"
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: server
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build ENV
+        run: |
+          echo "JWT_SECRET=$(openssl rand -base64 16)" >> .env
+          echo "ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}" >> .env
+          echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> .env
+          echo "ADMIN_NAME=${{ secrets.ADMIN_NAME }}" >> .env
+
+      - name: Copy project to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{  secrets.EC2_SSH_KEY }}
+          source: ".,!.git*"
+          target: "~/app/server"
+          overwrite: true
+
+
+      - name: Run Docker Compose on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key:  ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/app/server
+            docker compose down
+            docker compose pull
+            docker compose up -d --build 
+            docker system prune -f
