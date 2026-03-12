@@ -29,6 +29,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build Env
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+          # Não exponha esse tipo de informação em projetos reais
+          echo "VITE_WHATSAPP_NUMBER=35999999999"
+
       - name: Build project
         run: npm run build
 
